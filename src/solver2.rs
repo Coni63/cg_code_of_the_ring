@@ -15,11 +15,10 @@ fn distance(from_char: &u8, to_char: &u8) -> (char, u8) {
     }
 }
 
-pub fn convert_to_brainfuck2(s: &str) -> String {
+pub fn convert_to_brainfuck(s: &str) -> String {
     let tokens: Vec<u8> = s.chars().map(get_char_idx).collect();
 
     let mut state = State::new();
-    eprintln!("{:?}", state);
 
     for token in tokens.iter() {
         let rune = state.get_current_rune();
@@ -29,8 +28,6 @@ pub fn convert_to_brainfuck2(s: &str) -> String {
         }
         state.play('.');
     }
-
-    eprintln!("{:?}", state);
 
     state.get_output().to_string()
 }

@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt::Debug;
 
 pub struct State {
@@ -80,9 +81,32 @@ impl Debug for State {
             .collect();
         write!(
             f,
-            "Runes:\n{}\n{}\nRune index: {}\tChar index: {}",
-            output, position, self.rune_idx, self.char_idx
+            "Runes:\n{}\n{}\nRune index: {}\tChar index: {}\nAction: {}",
+            output, position, self.rune_idx, self.char_idx, self.output
         )
+    }
+}
+
+impl PartialEq for State {
+    fn eq(&self, other: &Self) -> bool {
+        self.char_idx == other.char_idx && self.output.len() == other.output.len()
+    }
+}
+
+impl Eq for State {}
+
+impl PartialOrd for State {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for State {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match self.char_idx.cmp(&other.char_idx) {
+            Ordering::Equal => other.output.len().cmp(&self.output.len()), // shorter length is better
+            other => other,
+        }
     }
 }
 
@@ -119,5 +143,37 @@ mod tests {
         assert_eq!(get_char_by_idx(&1), 'A');
         assert_eq!(get_char_by_idx(&26), 'Z');
         assert_eq!(get_char_by_idx(&27), '[');
+    }
+
+    #[test]
+    fn test_compare() {
+        let s1 = State {
+            runes: [0; 30],
+            rune_idx: 0,
+            char_idx: 3,
+            output: String::from("+++"),
+        };
+        let s2 = State {
+            runes: [0; 30],
+            rune_idx: 0,
+            char_idx: 3,
+            output: String::from("---"),
+        };
+        let s3 = State {
+            runes: [0; 30],
+            rune_idx: 0,
+            char_idx: 4,
+            output: String::from("+++"),
+        };
+        let s4 = State {
+            runes: [0; 30],
+            rune_idx: 0,
+            char_idx: 3,
+            output: String::from("+++--"),
+        };
+
+        assert!(s1 == s2);
+        assert!(s3 > s1);
+        assert!(s4 < s1);
     }
 }

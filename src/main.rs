@@ -1,11 +1,15 @@
 use std::io;
 
-mod solver;
-mod solver2;
 mod state;
 
-use solver::convert_to_brainfuck;
-use solver2::convert_to_brainfuck2;
+// mod solver;
+// use solver::convert_to_brainfuck;
+
+// mod solver2;
+// use solver2::convert_to_brainfuck;
+
+mod solver3;
+use solver3::convert_to_brainfuck;
 
 fn main() {
     let mut input_line = String::new();
