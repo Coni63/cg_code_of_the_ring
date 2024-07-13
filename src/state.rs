@@ -34,28 +34,50 @@ impl State {
         self.rune_idx
     }
 
-    pub fn play(&mut self, action: char) {
-        match action {
-            '>' => {
-                self.rune_idx = self.rune_idx.wrapping_add(1).wrapping_rem(30);
+    pub fn play(&mut self, actions: &str) {
+        let mut cursor = 0;
+        let mut backup_cursor = 5000;
+
+        while cursor < actions.len() {
+            match actions.chars().nth(cursor).unwrap() {
+                '>' => {
+                    self.rune_idx = self.rune_idx.wrapping_add(1).wrapping_rem(30);
+                }
+                '<' => {
+                    self.rune_idx = self.rune_idx.wrapping_add(29).wrapping_rem(30);
+                }
+                '.' => {
+                    self.char_idx += 1;
+                }
+                '+' => {
+                    self.runes[self.rune_idx] =
+                        self.runes[self.rune_idx].wrapping_add(1).wrapping_rem(27);
+                }
+                '-' => {
+                    self.runes[self.rune_idx] =
+                        self.runes[self.rune_idx].wrapping_add(26).wrapping_rem(27);
+                }
+                '[' => {
+                    if self.runes[self.rune_idx] == 0 {
+                        while actions.chars().nth(cursor).unwrap() != ']' {
+                            cursor += 1;
+                        }
+                    } else {
+                        backup_cursor = cursor;
+                    }
+                }
+                ']' => {
+                    if self.runes[self.rune_idx] == 0 {
+                        backup_cursor = 5000;
+                    } else {
+                        cursor = backup_cursor;
+                    }
+                }
+                _ => (),
             }
-            '<' => {
-                self.rune_idx = self.rune_idx.wrapping_add(29).wrapping_rem(30);
-            }
-            '.' => {
-                self.char_idx += 1;
-            }
-            '+' => {
-                self.runes[self.rune_idx] =
-                    self.runes[self.rune_idx].wrapping_add(1).wrapping_rem(27);
-            }
-            '-' => {
-                self.runes[self.rune_idx] =
-                    self.runes[self.rune_idx].wrapping_add(26).wrapping_rem(27);
-            }
-            _ => (),
+            cursor += 1;
         }
-        self.output.push(action);
+        self.output.push_str(actions);
     }
 }
 
